@@ -29,9 +29,10 @@ namespace FixUpExhibitPages {
 
             IComment end = null;
             if (start != null) {
-                for (INode innerNode = start.NextSibling; innerNode != null && end == null; innerNode = innerNode.NextSibling) {
+                for (INode innerNode = start.NextSibling; innerNode != null; innerNode = innerNode.NextSibling) {
                     if (innerNode is IComment comment && comment.Data == @" InstanceEndEditable ") {
                         end = comment;
+                        break;
                     } else {
                         contentNodes.Add(innerNode);
                     }
