@@ -37,7 +37,7 @@ namespace Test {
                 </html>");
             var pageFixer = new PageFixer(doc);
 
-            pageFixer.FixTitle();
+            pageFixer.fixTitle();
 
             doc.QuerySelector("head meta[property = 'og:title']").Attributes["content"].Value.Should().Be("A B C");
         }
@@ -63,7 +63,7 @@ namespace Test {
                 </html>");
             var pageFixer = new PageFixer(doc);
 
-            pageFixer.FixTitle();
+            pageFixer.fixTitle();
 
             doc.QuerySelector("h1").TextContent.Should().Be("A B C");
         }
@@ -91,7 +91,7 @@ namespace Test {
                 </html>");
             var pageFixer = new PageFixer(doc);
 
-            pageFixer.FixDescription();
+            pageFixer.fixDescription();
 
             doc.QuerySelector("head meta[property = 'og:description']").Attributes["content"].Value.Should().Be("D E F");
             doc.QuerySelector("header p").TextContent.Should().Be("D E F");
@@ -120,7 +120,7 @@ namespace Test {
                 </html>");
             var pageFixer = new PageFixer(doc);
 
-            pageFixer.FixDescription();
+            pageFixer.fixDescription();
 
             doc.QuerySelector("header p").TextContent.Should().Be("D E F");
         }
@@ -143,10 +143,10 @@ namespace Test {
                 </html>");
 
             var pageFixer = new PageFixer(doc) {
-                CurrentTimeProvider = () => fakeNow
+                currentTimeProvider = () => fakeNow
             };
 
-            pageFixer.FixTime();
+            pageFixer.fixTime();
             const string expectedIsoTimestamp = "2019-07-24T02:20:56.0000000-07:00";
             doc.QuerySelector("article > time").Attributes["datetime"].Value.Should().Be(expectedIsoTimestamp);
             doc.QuerySelector("article > time").Attributes["title"].Value.Should().Be(expectedIsoTimestamp);
@@ -173,7 +173,7 @@ namespace Test {
 
             var pageFixer = new PageFixer(doc);
 
-            pageFixer.FixImageSources();
+            pageFixer.fixImageSources();
 
             doc.QuerySelector("#relativeImg").GetAttribute("src").Should()
                 .Be("https://west.aldaviva.com/exhibits/images/a/b.jpg");
@@ -203,7 +203,7 @@ namespace Test {
 
             var pageFixer = new PageFixer(doc);
 
-            pageFixer.FixImageAlternateText();
+            pageFixer.fixImageAlternateText();
 
             doc.QuerySelector<IHtmlImageElement>("img").AlternativeText.Should().Be("X Y Z");
         }

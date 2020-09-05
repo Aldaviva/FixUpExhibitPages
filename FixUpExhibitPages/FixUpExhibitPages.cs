@@ -10,6 +10,8 @@ using AngleSharp;
 using AngleSharp.Dom;
 using Console = Colorful.Console;
 
+#nullable enable
+
 namespace FixUpExhibitPages {
 
     public static class FixUpExhibitPages {
@@ -28,36 +30,36 @@ namespace FixUpExhibitPages {
             IBrowsingContext browsingContext = BrowsingContext.New(angleSharpConfig);
 
             Task.WaitAll((from htmlFilename in htmlFilenames
-                let fileStream = File.OpenRead(htmlFilename)
-                select browsingContext.OpenAsync(req => {
-                        req.Address("https://aldaviva.com/exhibits/fake.html");
-                        req.Content(fileStream);
-                    })
-                    .ContinueWith(task => {
-                        fileStream.Dispose();
-                        using (IDocument document = task.Result) {
-                            try {
-                                var pageFixer = new PageFixer(document);
+                          let fileStream = File.OpenRead(htmlFilename)
+                          select browsingContext.OpenAsync(req => {
+                                  req.Address("https://aldaviva.com/exhibits/fake.html");
+                                  req.Content(fileStream);
+                              })
+                              .ContinueWith(task => {
+                                  fileStream.Dispose();
+                                  using IDocument document = task.Result;
 
-                                pageFixer.FixTitle();
-                                pageFixer.FixDescription();
-                                pageFixer.FixTime();
-                                pageFixer.FixImageSources();
-                                pageFixer.FixImageAlternateText();
-                            } catch (Exception e) {
-                                Console.WriteLine($"Error while editing {htmlFilename}");
-                                Console.WriteLine(e.Message);
-                                Console.WriteLine(e.StackTrace);
-                                throw;
-                            }
+                                  try {
+                                      var pageFixer = new PageFixer(document);
 
-                            using (TextWriter writer = new StreamWriter(htmlFilename, false, Encoding.UTF8)) {
-                                document.ToHtml(writer);
-                            }
+                                      pageFixer.fixTitle();
+                                      pageFixer.fixDescription();
+                                      pageFixer.fixTime();
+                                      pageFixer.fixImageSources();
+                                      pageFixer.fixImageAlternateText();
+                                  } catch (Exception e) {
+                                      Console.WriteLine($"Error while editing {htmlFilename}");
+                                      Console.WriteLine(e.Message);
+                                      Console.WriteLine(e.StackTrace);
+                                      throw;
+                                  }
 
-                            Console.WriteLine($"Saved {Path.GetFileName(htmlFilename)}", Color.DeepSkyBlue);
-                        }
-                    })).ToArray());
+                                  using (TextWriter writer = new StreamWriter(htmlFilename, false, Encoding.UTF8)) {
+                                      document.ToHtml(writer);
+                                  }
+
+                                  Console.WriteLine($"Saved {Path.GetFileName(htmlFilename)}", Color.DeepSkyBlue);
+                              })).ToArray());
 
             stopwatch.Stop();
             Console.WriteLine($"Done in {stopwatch.ElapsedMilliseconds} ms.", Color.LawnGreen);

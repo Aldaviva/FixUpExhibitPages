@@ -2,6 +2,8 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 
+#nullable enable
+
 namespace FixUpExhibitPages {
 
     internal class PageFixer {
@@ -11,38 +13,38 @@ namespace FixUpExhibitPages {
 
         private readonly IDocument document;
 
-        internal Func<DateTime> CurrentTimeProvider { private get; set; } = () => DateTime.Now;
+        internal Func<DateTime> currentTimeProvider { private get; set; } = () => DateTime.Now;
 
         public PageFixer(IDocument document) {
             this.document = document;
         }
 
-        public void FixTitle() {
+        public void fixTitle() {
             string title = document.Head.QuerySelector("title").TextContent;
             if (!string.IsNullOrWhiteSpace(title)) {
                 // copy title to og title
-                PageManipulator.UpsertHeadElement(document, "meta", "property", "og:title", title);
+                PageManipulator.upsertHeadElement(document, "meta", "property", "og:title", title);
                 // copy title to h1
-                PageManipulator.ReplaceTemplateText(document, document.QuerySelector("main article header h1"), "TitleDerived", title);
+                PageManipulator.replaceTemplateText(document, document.QuerySelector("main article header h1"), "TitleDerived", title);
             }
         }
 
-        public void FixDescription() {
+        public void fixDescription() {
             string description = document.Head.QuerySelector(@"meta[name = 'Description']")?.GetAttribute(PageManipulator.CONTENT) ??
                                  "";
             // copy description to og description
             if (!string.IsNullOrWhiteSpace(description)) {
-                PageManipulator.UpsertHeadElement(document, "meta", "property", "og:description", description);
+                PageManipulator.upsertHeadElement(document, "meta", "property", "og:description", description);
                 // copy description to header p
-                PageManipulator.ReplaceTemplateText(document, document.QuerySelector("main article header p"), "SubtitleDerived",
+                PageManipulator.replaceTemplateText(document, document.QuerySelector("main article header p"), "SubtitleDerived",
                     description);
             }
         }
 
-        public void FixTime() {
+        public void fixTime() {
             // fill in article time and its datetime
             IElement timeEl = document.QuerySelector("main article > time");
-            DateTime now = CurrentTimeProvider();
+            DateTime now = currentTimeProvider();
             if (string.IsNullOrWhiteSpace(timeEl.GetAttribute("datetime"))) {
                 timeEl.SetAttribute("datetime", now.ToString("O"));
             }
@@ -55,7 +57,7 @@ namespace FixUpExhibitPages {
             timeEl.SetAttribute("title", timeEl.GetAttribute("datetime"));
         }
 
-        public void FixImageSources() {
+        public void fixImageSources() {
             // rewrite relative img src to be resolved against https://west.aldaviva.com/exhibits/images/
             foreach (IHtmlImageElement imageEl in document.QuerySelectorAll<IHtmlImageElement>("img")) {
                 var imageSourceUri = new Uri(imageEl.GetAttribute("src"), UriKind.RelativeOrAbsolute);
@@ -65,7 +67,7 @@ namespace FixUpExhibitPages {
             }
         }
 
-        public void FixImageAlternateText() {
+        public void fixImageAlternateText() {
             // copy figcaptions to figure img alt
             foreach (IElement figureEl in document.QuerySelectorAll("figure")) {
                 IElement imageEl = figureEl.QuerySelector("img");
