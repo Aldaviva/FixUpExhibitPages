@@ -6,6 +6,7 @@ namespace FixUpExhibitPages {
 
     internal class PageFixer {
 
+        private const string FIXUP_HINT = "Run FixUpExhibitPages.exe to fill in";
         private static readonly Uri WEST_IMAGES_BASE_URI = new Uri("https://west.aldaviva.com/exhibits/images/");
 
         private readonly IDocument document;
@@ -46,7 +47,7 @@ namespace FixUpExhibitPages {
                 timeEl.SetAttribute("datetime", now.ToString("O"));
             }
 
-            if (string.IsNullOrWhiteSpace(timeEl.TextContent)) {
+            if (string.IsNullOrWhiteSpace(timeEl.TextContent) || timeEl.TextContent == FIXUP_HINT) {
                 timeEl.TextContent = now.ToLongDateString();
             }
 
